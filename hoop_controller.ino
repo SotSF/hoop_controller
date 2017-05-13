@@ -6,24 +6,11 @@
 
 FASTLED_USING_NAMESPACE
 
-// FastLED "100-lines-of-code" demo reel, showing just a few 
-// of the kinds of animation patterns you can quickly and easily 
-// compose using FastLED.  
-//
-// This example also shows one easy way to define multiple 
-// animations patterns and have them automatically rotate.
-//
-// -Mark Kriegsman, December 2014
-
-#if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
-	#warning "Requires FastLED 3.1 or later; check github for latest code."
-#endif
-
 #define DATA_PIN    5
 #define CLK_PIN     7
 #define LED_TYPE    APA102
 #define COLOR_ORDER BGR
-#define NUM_LEDS    16
+#define NUM_LEDS    32
 	CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS          10
@@ -32,12 +19,9 @@ const char* NoteNames[] = { "rest","c ","cs","d ","ds","e ","f ","fs","g ","gs",
 void setup() {
 	delay(3000); // 3 second delay for recovery
 
-	// tell FastLED about the LED strip configuration
-	//FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 	FastLED.addLeds<LED_TYPE, DATA_PIN, CLK_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-
-	// set master brightness control
 	FastLED.setBrightness(BRIGHTNESS);
+
 	Serial.begin(9600);
 	Serial.print("b fifths:");
 	Serial.println(b_fifths, BIN);
@@ -58,15 +42,15 @@ void setup() {
 void loop()
 {
 	for (int i = 0; i < NUM_LEDS; i++) {
-		leds[i] = CRGB(10, 10, 50);
+		leds[i] = CRGB(5, 5, 25);
 	}
 	chord composite = Song2300.next();
 	Serial.print("Inbound note: ");
 	Serial.println(composite, BIN);
 	int note = root;
-	while (note < 25) {
+	while (composite > 0) {
 		if (composite & Notes[note]) {
-			Serial.println(note, BIN);
+			Serial.println(NoteNames[note]);
 			composite ^= Notes[note];
 			if (note < NUM_LEDS){
 				leds[note] = CRGB(255, 255, 255);
@@ -75,13 +59,8 @@ void loop()
 		note++;
 	}
 
-	// send the 'leds' array out to the actual LED strip
 	FastLED.show();  
-	// insert a delay to keep the framerate modest
 	long delay = (60 * 1000L) / Song2300.BPM;
 	FastLED.delay(delay); 
 
-	// do some periodic updates
-	// EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
-	// EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
 }
