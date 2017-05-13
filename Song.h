@@ -2,27 +2,23 @@
 
 #ifndef _SONG_h
 #define _SONG_h
-#include <stdarg.h>
-#include <stdio.h>
+#include "Notes.h"
+#include "Chords.h"
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "arduino.h"
 #else
 	#include "WProgram.h"
 #endif
+class SongClass {
 
-
-
-class SongClass
-{
- protected:
-	 uint16_t position = 0;
-
- public:
-	uint8_t BPM;
+	uint16_t position;
 	uint16_t length;
-	int b_minor;
-	int e_minor;
-	void begin();
+
+public:
+	uint8_t BPM;
+	const chord * score;
+	chord next();
+	SongClass(const uint8_t BPM, const uint16_t length, const chord* song);
 };
 
 extern SongClass Song;
