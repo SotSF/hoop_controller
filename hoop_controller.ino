@@ -13,7 +13,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    32
 	CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS          10
+#define BRIGHTNESS          30
 #define FRAMES_PER_SECOND  120
 const char* NoteNames[] = { "rest","c ","cs","d ","ds","e ","f ","fs","g ","gs","a ","as","b ","C ","Cs","D ","Ds","E ","F ","Fs","G ","Gs","A ","As","B " };
 void setup() {
