@@ -5,7 +5,7 @@
 #include "Chords.h"
 #include <stdarg.h>
 
-/* The boring, array based versaion.
+/* The boring, array based version.
 chord enchord(size_t len, int * notes) {
 	chord output = 0;
 	for (int i = 0; i < len; i++) {
