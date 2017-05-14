@@ -10,7 +10,7 @@ FASTLED_USING_NAMESPACE
 #define CLK_PIN     7
 #define LED_TYPE    APA102
 #define COLOR_ORDER BGR
-#define NUM_LEDS    32
+#define NUM_LEDS    432
 	CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS          10
@@ -49,11 +49,19 @@ void loop()
 	Serial.println(composite, BIN);
 	int note = root;
 	while (composite > 0) {
+    // bitmask matches notes, then we output the pattern we want for that note
 		if (composite & Notes[note]) {
 			Serial.println(NoteNames[note]);
+      // XOR removes note from the composite
 			composite ^= Notes[note];
 			if (note < NUM_LEDS){
-				leds[note] = CRGB(255, 255, 255);
+        // could be in function to output the specific note differently by the note
+        // testing 432 LED string, multiply by 18 = (432 / 24)
+        int note432 = note * 18;
+        int finish = note432 + 18;
+        for (note432; note432 < finish; note432++){
+          leds[note432] = CRGB(255, 255, 255);
+        }
 			}
 		}
 		note++;
