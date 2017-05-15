@@ -1,1 +1,7 @@
 .idea/*
+*.sln
+*.vcxproj
+*.vcxproj.filters
+Debug/*
+.vs/*
+__vm/*
