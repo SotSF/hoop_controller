@@ -8,9 +8,9 @@ FASTLED_USING_NAMESPACE
 
 #define DATA_PIN    5
 #define CLK_PIN     7
-#define LED_TYPE    APA102
+#define LED_TYPE    NEOPIXEL
 #define COLOR_ORDER BGR
-#define NUM_LEDS    32
+#define NUM_LEDS    432
 	CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS          30
@@ -19,7 +19,7 @@ const char* NoteNames[] = { "rest","c ","cs","d ","ds","e ","f ","fs","g ","gs",
 void setup() {
 	delay(3000); // 3 second delay for recovery
 
-	FastLED.addLeds<LED_TYPE, DATA_PIN, CLK_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+	FastLED.addLeds<LED_TYPE, DATA_PIN>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 	FastLED.setBrightness(BRIGHTNESS);
 
 	Serial.begin(9600);
@@ -52,15 +52,16 @@ void loop()
 		if (composite & Notes[note]) {
 			Serial.println(NoteNames[note]);
 			composite ^= Notes[note];
-			if (note < NUM_LEDS){
-				leds[note] = CRGB(255, 255, 255);
-			}
+      int start = 18 * (note - 1);
+      for(int i=0; i<18; i++){
+          leds[start+i] = CRGB(255, 255, 255); 
+      }
 		}
 		note++;
 	}
 
 	FastLED.show();  
-	long delay = (60 * 1000L) / Song2300.BPM;
-	FastLED.delay(delay); 
+	long delay = (10 * 1000L) / Song2300.BPM;
+	FastLED.delay(delay);
 
 }
