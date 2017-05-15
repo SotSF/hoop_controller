@@ -5,20 +5,20 @@
 #include "Notes.h"
 #include "Chords.h"
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+    #include "arduino.h"
 #else
-	#include "WProgram.h"
+    #include "WProgram.h"
 #endif
 class SongClass {
 
-	uint16_t position;
-	uint16_t length;
+    uint16_t position;
+    uint16_t length;
 
 public:
-	uint8_t BPM;
-	const chord * score;
-	chord next();
-	SongClass(const uint8_t BPM, const uint16_t length, const chord* song);
+    uint8_t BPM;
+    const chord * score;
+    chord next();
+    SongClass(const uint8_t BPM, const uint16_t length, const chord* song);
 };
 
 extern SongClass Song;
