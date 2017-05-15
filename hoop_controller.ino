@@ -11,8 +11,9 @@ FASTLED_USING_NAMESPACE
 #define LED_TYPE    NEOPIXEL
 #define COLOR_ORDER BGR
 #define NUM_LEDS    432
-    CRGB leds[NUM_LEDS];
+#define BLOCKSIZE   NUM_LEDS/24
 
+CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          30
 #define FRAMES_PER_SECOND  120
 const char* NoteNames[] = { "rest","c ","cs","d ","ds","e ","f ","fs","g ","gs","a ","as","b ","C ","Cs","D ","Ds","E ","F ","Fs","G ","Gs","A ","As","B " };
@@ -39,10 +40,21 @@ void setup() {
     }
 }
 
+void handlenote(int offset) {
+    fadeToBlackBy(leds + (offset * sizeof(leds[0])), BLOCKSIZE, 10);
+    for (int i = offset; i < offset + BLOCKSIZE; i++) {
+        leds[i] = CRGB(255, 255, 255);
+    }
+}
+
+void handlepixel(int offset) {
+    leds[offset] = CRGB(5, 5, 25);
+}
+
 void loop()
 {
     for (int i = 0; i < NUM_LEDS; i++) {
-        leds[i] = CRGB(5, 5, 25);
+        handlepixel(i);
     }
     chord composite = Song2300.next();
     Serial.print("Inbound note: ");
@@ -52,10 +64,8 @@ void loop()
         if (composite & Notes[note]) {
             Serial.println(NoteNames[note]);
             composite ^= Notes[note];
-      int start = 18 * (note - 1);
-      for(int i=0; i<18; i++){
-          leds[start+i] = CRGB(255, 255, 255); 
-      }
+            int start = BLOCKSIZE * (note - 1);
+            handlenote(start);
         }
         note++;
     }
