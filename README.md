@@ -9,8 +9,10 @@ Try to code as close to the FastLED output as possible.
 
 To run them, cd into ./simulations and run a server
 
+```
 > cd ./simulations
 > python -m SimpleHTTPServer
+```
 
 then just open http://localhost:8000
 
