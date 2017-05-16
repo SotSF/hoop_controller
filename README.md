@@ -24,7 +24,7 @@ The songs will be defined in the format `Song[hour].h`, as seen in `Song2300.h`.
 ## Goals & ongoing work
 - The musical timing system needs better granularity. Note that there are still 7 bits left in the Chord definition, which we could use to encode some kind of timing information
 - The note lead-in animation length could be decoupled from frame rate. Currently it plays faster or slower depending on how fast the LEDs are running. This could be changed to be dependent on a time value, allowing easier tweaking.
-- An understanding of the 24 hours, advancing through the album of 24 songs, etc needs to be added
+- An understanding of the 24 hours, advancing through the album of 24 songs, etc needs to be added. This may require a real-time clock module, see eg http://www.makeuseof.com/tag/how-and-why-to-add-a-real-time-clock-to-arduino/
 - Background / sun animation could be included underneath the notes, for a multi-layered approach to the display
 
 ## Simulations
