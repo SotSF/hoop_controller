@@ -13,7 +13,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    432
 #define BLOCKSIZE   NUM_LEDS/24
 #define OFFSET(note) (BLOCKSIZE * (note - 1))
-#define BRIGHTNESS  20
+#define BRIGHTNESS  5
 #define FPS         30
 
 CRGB leds[NUM_LEDS];
