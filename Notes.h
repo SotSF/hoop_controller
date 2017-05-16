@@ -17,8 +17,9 @@ const typedef enum {
     C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B
 } Note;
 
-const long Notes[] = { rest, root << c, root << cs, root << d, root << ds, root << e, root << f, root << fs, root << g, root << gs, root << a, root << as, root << b,
-root << C, root << Cs, root << D, root << Ds, root << E, root << F, root << Fs, root << G, root << Gs, root << A, root << As, root << B };
+const long Notes[] = { rest, 
+                       root << c, root << cs, root << d, root << ds, root << e, root << f, root << fs, root << g, root << gs, root << a, root << as, root << b,
+                       root << C, root << Cs, root << D, root << Ds, root << E, root << F, root << Fs, root << G, root << Gs, root << A, root << As, root << B };
 
 #endif
 
