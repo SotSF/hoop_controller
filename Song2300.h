@@ -10,13 +10,14 @@
 #endif
 
 static const uint8_t BPM = 120;
-static const chord score[] =
+static const Chord score[] =
 {
-    e_minor, Notes[e], Notes[a], Notes[b], rest,
+    /*e_minor, Notes[e], Notes[a], Notes[b], rest,
     e_minor, Notes[e], Notes[b], Notes[b], rest,
     c_octave, Notes[c], Notes[C], c_octave, rest,
     Notes[c], Notes[cs], Notes[d], Notes[ds], rest,
-    Notes[C], Notes[D], Notes[Ds], Notes[F], rest
+    Notes[C], Notes[D], Notes[Ds], Notes[F], rest*/
+    Notes[B], enchord(2, As, Gs), Notes[A], enchord(2, As, Gs)
 };
 
 SongClass Song2300 = SongClass(BPM, sizeof(score)/sizeof(score[0]), score);
