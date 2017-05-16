@@ -10,18 +10,18 @@
     #include "WProgram.h"
 #endif
 
-typedef long chord;
+typedef long Chord;
 // Creates a "chord" via bitmasking together the individual notes
-chord enchord(int numnotes, ...);
+Chord enchord(int numnotes, ...);
 
-// Decomposes a chord into its individual notes
-Note * dischord(chord input);
+// Applies a function to each note of a chord
+void chordmap(Chord input, void (*func)(int note));
 
-const chord a_octave = enchord(2, a, A);
-const chord b_fifths = enchord(3, b, b+7, b-7);
-const chord e_octave = enchord(2, e, E);
-const chord c_octave = enchord(2, c, C);
-const chord e_minor = enchord(6, e, g, b, E, G, B);
+const Chord a_octave = enchord(2, a, A);
+const Chord b_fifths = enchord(3, b, b+7, b-7);
+const Chord e_octave = enchord(2, e, E);
+const Chord c_octave = enchord(2, c, C);
+const Chord e_minor = enchord(6, e, g, b, E, G, B);
 //etc
 #endif
 

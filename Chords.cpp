@@ -14,9 +14,9 @@ chord enchord(size_t len, int * notes) {
     return output;
 } */
 
-// The exciting and dangerous variadic version!
-chord enchord(int numnotes, ...) {
-    chord outchord = 0;
+// Compose a chord out of notes, the exciting and dangerous variadic version!
+Chord enchord(int numnotes, ...) {
+    Chord outchord = 0;
     va_list args;
     va_start(args, numnotes);
     for (int i = 1; i <= numnotes; i++) {
@@ -27,11 +27,15 @@ chord enchord(int numnotes, ...) {
     return outchord;
 }
 
-Note * dischord(chord input) {
-    Note * outnotes = (Note *)malloc(sizeof(Note));
-    for (uint8_t i = 1; i < 25; i++) {
-        if (Notes[i] & input) {
-
+// Apply a function to each note of a chord
+void chordmap(Chord input, void (*func)(int note)) {
+    int i = 1;
+    long comparison = input;
+    while (comparison > 0) {
+        if (Notes[i] & comparison) {
+            comparison ^= Notes[i];
+            func(i);
         }
+        i++;
     }
 }
