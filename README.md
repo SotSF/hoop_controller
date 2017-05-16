@@ -2,7 +2,7 @@
 Code to run the hoop for the Shrine of the Singing Sun
 
 ## Design and rationale
-The Arduino platform, as embedded system, has no real OS or filesystem. All data must be baked into the executable, or provided through some interface (eg a storage breakout board).
+The Arduino platform, as a lightweight embedded system, has no real OS or filesystem. All data must be baked into the executable, or provided through some interface (eg a storage breakout board).
 
 Thus, the simplest approach is to encode songs as big C++ objects in the program source. To achieve this, we use header files defining Song objects implementing a common `SongClass`.
 Notes and Chords are encoded as a bitmask of the 24 possible notes, and decomposed during animation.
