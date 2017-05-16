@@ -16,9 +16,9 @@ class SongClass {
 
 public:
     uint8_t BPM;
-    const chord * score;
-    chord next();
-    SongClass(const uint8_t BPM, const uint16_t length, const chord* song);
+    const Chord * score;
+    Chord next();
+    SongClass(const uint8_t BPM, const uint16_t length, const Chord* song);
 };
 
 extern SongClass Song;
