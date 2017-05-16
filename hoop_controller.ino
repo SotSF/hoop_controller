@@ -34,6 +34,7 @@ void setup() {
 Chord upcoming = 0;
 Chord fadingout = 0;
 
+// Begins a note's lead-in with two red dots at opposite ends
 void beginnote(Note note) {
     Serial.println(NoteNames[note]);
     upcoming |= Notes[note];
@@ -41,14 +42,15 @@ void beginnote(Note note) {
     leds[OFFSET(note)+BLOCKSIZE-1] = CRGB(100,6,0);
 }
 
+// Repaints the background for a given note-block
 void fillbg(Note note) {
     for (byte i = 0; i < BLOCKSIZE; i++) {
         leds[OFFSET(note) + i] = CRGB(5, 5, 25);
     }
 }
 
+// Animates the converging red dots before a note is to be played
 void leadnote(Note note) {
-    // Determine how far in the red pulse has moved
     int start = OFFSET(note);
     bool finished = true;
     for (byte i = 0; i < BLOCKSIZE / 2; i++) {
@@ -65,6 +67,8 @@ void leadnote(Note note) {
             leds[start + BLOCKSIZE - 1 - i] -= CRGB(20, 10, 0);
         }
     }
+    // If dots have converged, play the white pulse, remove note from upcoming
+    // and add to fading out
     if (finished) {
         for (byte i = 0; i < BLOCKSIZE; i++) {
             leds[start + i] = CRGB(155, 155, 155);
@@ -86,6 +90,7 @@ void fadenote(Note note) {
     }
 }
 
+// Main function which is looped continuously
 void loop()
 {
     // Fetch a new note every beat, apply the beginnote function
