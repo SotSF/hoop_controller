@@ -12,7 +12,7 @@
 
 typedef long Chord;
 // Creates a "chord" via bitmasking together the individual notes
-Chord enchord(int numnotes, ...);
+Chord enchord(byte numnotes, ...);
 
 // Applies a function to each note of a chord
 void chordmap(Chord input, void (*func)(int note));
