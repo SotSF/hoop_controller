@@ -123,4 +123,21 @@
          </ul>
        </article>
      </body>
+     <script type="text/javascript">
+      $(document).ready(function () {
+        var leds = $('.WS2812-led'),
+          angle = 0,
+          step = 2 * Math.PI / leds.length;
+          leds.each(function() {
+              var x = Math.round(300 * Math.cos(angle)),
+                 y = Math.round(300 * Math.sin(angle));
+              $(this).css({
+                  "left": (x + 700) + 'px',
+                  "top": (y + 400) + 'px'
+              });
+              angle += step;
+          });
+        });
+      
+     </script>
      </html>
