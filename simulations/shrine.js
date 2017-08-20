@@ -46,7 +46,7 @@ We calculate the position of the sun from the hour
 Shrine.prototype.sun = function(hour, sun_color, tick) {
     if (!(tick % this.speed == 0)) return; // speed control
 
-    var pos = Math.floor(hour * (this.NUM_LEDS / 24));
+    var pos = Math.floor(hour * (this.NUM_LEDS / 12));
     // Set the center of the sun
     this.ledstrip.buffer[pos] = sun_color;    
 
