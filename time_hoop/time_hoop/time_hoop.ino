@@ -16,7 +16,7 @@ FASTLED_USING_NAMESPACE
 
 // Sun consts
 // #define SUN_COLOR  {200, 50, 50};
-#define SUN_SPREAD 10
+#define SUN_SPREAD 5
 
 CRGB leds[NUM_LEDS];
 
@@ -51,7 +51,7 @@ void loop()
 }
 
 void OverlaySun() {
-    CRGB SUN_COLOR = CHSV(68, 65, 100);
+    CRGB SUN_COLOR = CHSV(68, 120, 255);
     int pos = floor(hour() * (NUM_LEDS / 24));
     // Set the center of the sun
     Serial.print("hour: ");
@@ -75,9 +75,9 @@ void OverlaySun() {
             int forwardPos = (pos + i) % NUM_LEDS;
             int rearPos = (pos + NUM_LEDS - i) % NUM_LEDS;
             leds[forwardPos] = SUN_COLOR;
-            leds[forwardPos].setHue(floor(100 * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));
+            leds[forwardPos].setHue(floor(255 * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));
             leds[rearPos] = SUN_COLOR;
-            leds[rearPos].setHue(floor(100 * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));;
+            leds[rearPos].setHue(floor(255 * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));;
         }
     }
 

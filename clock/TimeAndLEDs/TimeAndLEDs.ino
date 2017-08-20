@@ -68,6 +68,7 @@ void LEDdisplay() {
   } else {
       leds[ second() ] += CRGB::Red;   
    }
+   leds [minute() + 60] += CRGB::Blue;
  }
 
 void digitalClockDisplay() {
