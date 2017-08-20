@@ -19,3 +19,11 @@ Chord SongClass::next() {
     return nextval;
 }
 
+int SongClass::getPosition() {
+    return this->position;
+}
+
+int SongClass::getLength() {
+  return this->length;
+}
+

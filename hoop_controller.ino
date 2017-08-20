@@ -1,7 +1,7 @@
 #include "Chords.h"
 #include "Notes.h"
-#include "Song2300.h"
 #include "Song.h"
+#include "Songs.h"
 #include "FastLED.h"
 
 FASTLED_USING_NAMESPACE
@@ -11,15 +11,16 @@ FASTLED_USING_NAMESPACE
 #define LED_TYPE    NEOPIXEL
 #define COLOR_ORDER BGR
 #define NUM_LEDS    432
-#define BLOCKSIZE   NUM_LEDS/24
+#define BLOCKSIZE   NUM_LEDS/12
 #define OFFSET(note) (BLOCKSIZE * (note - 1))
 #define BRIGHTNESS  5
 #define FPS         30
 
 CRGB leds[NUM_LEDS];
+SongClass currentSong = SongTest;
+float lastSongSet = 0;
 
-
-const char* NoteNames[] = { "rest","c ","cs","d ","ds","e ","f ","fs","g ","gs","a ","as","b ","C ","Cs","D ","Ds","E ","F ","Fs","G ","Gs","A ","As","B " };
+const char* NoteNames[] = { "rest","C ","Cs","D ","Ds","E ","F ","Fs","G ","Gs","A ","As","B " };
 void setup() {
     delay(3000); // 3 second delay for recovery
 
@@ -93,9 +94,15 @@ void fadenote(Note note) {
 // Main function which is looped continuously
 void loop()
 {
+    if (millis() - lastSongSet >= 60000) {
+        if (currentSong.getPosition() == currentSong.getLength()){
+          // TODO: set Next Song
+          lastSongSet = millis();
+        }
+    }
     // Fetch a new note every beat, apply the beginnote function
-    EVERY_N_MILLISECONDS(60000L / Song2300.BPM) {
-        Chord composite = Song2300.next();
+    EVERY_N_MILLISECONDS(60000L / currentSong.BPM) {
+        Chord composite = currentSong.next();
         Serial.print("Inbound composite: ");
         Serial.println(composite, BIN);
         chordmap(composite, beginnote);

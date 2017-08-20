@@ -18,6 +18,8 @@ public:
     uint8_t BPM;
     const Chord * score;
     Chord next();
+    int getPosition();
+    int getLength();
     SongClass(const uint8_t BPM, const uint16_t length, const Chord* song);
 };
 
