@@ -1,6 +1,8 @@
 #include <FastLED.h>
 #include <TimeLib.h>
 #include <math.h>
+#include "Fire.h"
+#include "Night.h"
 
 FASTLED_USING_NAMESPACE
 
@@ -15,9 +17,10 @@ FASTLED_USING_NAMESPACE
 #define FRAMES_PER_SECOND  120
 
 // Sun consts
-// #define SUN_COLOR  {200, 50, 50};
 #define SUN_SPREAD 5
-
+#define SUN_HUE 40
+#define SUN_SAT 255
+#define SUN_V 255
 CRGB leds[NUM_LEDS];
 
 
@@ -28,7 +31,7 @@ void setup() {
   Serial.begin(115200);
   while (!Serial);  // Wait for Arduino Serial Monitor to open
   delay(3000); // 3 second delay for recovery
-  
+
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE,DATA_PIN>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
@@ -37,21 +40,43 @@ void setup() {
 }
 
 
+typedef void (*displayFunc[])(CRGB*, int);
+
+displayFunc funArray = {
+  &runNight,
+  &runFire
+};
+
 // Main function which is looped continuously
 void loop()
 {
 
   // display time on LEDs
-  LEDdisplay();
+  //LEDdisplay();
+  int numPatterns = 2;
+  int funcIndex = getDisplayFuncIndex(numPatterns);
+      Serial.print("ind: ");
+    Serial.print(funcIndex);
+    Serial.println();
+  // 20 sec * 60 min * 24 h
+  // time = hour * 60 * 24
+  // total / num_patterns
+  //runFire(leds, NUM_LEDS);
+  //runNight(leds, NUM_LEDS);
+  funArray[funcIndex](leds, NUM_LEDS);
   OverlaySun();
   FastLED.show();
-  FastLED.delay(1000/FRAMES_PER_SECOND); 
+  FastLED.delay(1000/FRAMES_PER_SECOND);
 
   delay(1000);
 }
 
+int getDisplayFuncIndex(int numPatterns) {
+  int sliceNum = ((hour() * 60 *60 ) + (minute() *60) + second()) / 20;
+  return ((int)floor(sliceNum) % numPatterns);
+}
+
 void OverlaySun() {
-    CRGB SUN_COLOR = CHSV(68, 120, 255);
     int pos = floor(hour() * (NUM_LEDS / 24));
     // Set the center of the sun
     Serial.print("hour: ");
@@ -60,27 +85,20 @@ void OverlaySun() {
     Serial.print(", center: ");
     Serial.print(pos);
     Serial.println();
-    
-    leds[pos] = SUN_COLOR;    
+
+    leds[pos] = CHSV(SUN_HUE, SUN_SAT, SUN_V);
 
     // spread the sun center
     if (SUN_SPREAD > 0) {
 
         for (int i = 1; i <= SUN_SPREAD; i++) {
-            /*CRGB scol = CHSV(
-                SUN_COLOR[0], 
-                SUN_COLOR[1], 
-                floor(SUN_COLOR[2] * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1)))
-            );*/
             int forwardPos = (pos + i) % NUM_LEDS;
             int rearPos = (pos + NUM_LEDS - i) % NUM_LEDS;
-            leds[forwardPos] = SUN_COLOR;
-            leds[forwardPos].setHue(floor(255 * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));
-            leds[rearPos] = SUN_COLOR;
-            leds[rearPos].setHue(floor(255 * ((SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));;
+
+            leds[forwardPos] = CHSV(SUN_HUE, SUN_SAT, floor(SUN_V * ((float)(SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));
+            leds[rearPos] = CHSV(SUN_HUE, SUN_SAT, floor(SUN_V * ((float)(SUN_SPREAD + 1 - i) / (SUN_SPREAD + 1))));;
         }
     }
-
 }
 
 time_t getTeensy3Time()
