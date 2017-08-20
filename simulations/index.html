@@ -15,6 +15,7 @@
     <script type="text/javascript" src="twinklesparkle.js"></script>
     <!--<script type="text/javascript" src="fire.js"></script>-->
     <script type="text/javascript" src="round_fire.js"></script>
+    <script type="text/javascript" src="wheel.js"></script>
     <script type="text/javascript" src="eyeblink.js"></script>
 
     <script type="text/javascript" src="shrine.js"></script>
@@ -26,7 +27,7 @@
       var container = $('.ledstrip')[0];
       var light_count = 432;
       strip = LEDstrip(container, light_count);
-      driver = new Fire(strip);
+      driver = new Wheel(strip);
       driver.init();
       animation = driver.animate.bind(driver)();
 
@@ -68,6 +69,8 @@
             break;
           case 'fire':
             driver = new Fire(strip);
+          case 'wheel':
+            driver = new Wheel(strip);
             break;
       /*
           case 'cycle': 
@@ -108,6 +111,7 @@
              <option value="lightning">Lightning</option>
              <option value="twinklesparkle">TwinkleSparkle</option>
              <option value="fire">Fire</option>
+             <option value="cool">Cool</option>
              <option value="eyeblink">Eyeblink</option>
              <option value="shrine">Shrine</option>
              <!-- <option value="cycle">Color Cycle</option> -->
