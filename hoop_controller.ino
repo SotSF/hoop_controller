@@ -6,11 +6,10 @@
 
 FASTLED_USING_NAMESPACE
 
-#define DATA_PIN    5
-#define CLK_PIN     7
-#define LED_TYPE    NEOPIXEL
-#define COLOR_ORDER BGR
-#define NUM_LEDS    432
+#define DATA_PIN    11
+#define CLK_PIN     13
+#define LED_TYPE    APA102
+#define NUM_LEDS    216
 #define BLOCKSIZE   NUM_LEDS/12
 #define OFFSET(note) (BLOCKSIZE * (note - 1))
 #define BRIGHTNESS  5
@@ -24,7 +23,7 @@ const char* NoteNames[] = { "rest","C ","Cs","D ","Ds","E ","F ","Fs","G ","Gs",
 void setup() {
     delay(3000); // 3 second delay for recovery
 
-    FastLED.addLeds<LED_TYPE, DATA_PIN>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<LED_TYPE, DATA_PIN, CLK_PIN>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.setBrightness(BRIGHTNESS);
 
     for (int i = 0; i < NUM_LEDS; i++) {
