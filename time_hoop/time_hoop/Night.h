@@ -4,6 +4,6 @@
 #ifndef Night_h
 #define Night_h
 
-void runNight(CRGB*, int);
+void runNight(CRGB*, int, int);
 
 #endif
