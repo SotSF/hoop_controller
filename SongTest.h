@@ -15,7 +15,7 @@ static const Chord testScore[] =
    Notes[Fs], Notes[G], Notes[Gs], Notes[A], Notes[As], Notes[B]
 };
 
-SongClass SongTest = SongClass(120, testScore, testScore);
+SongClass SongTest = SongClass(120, sizeof(testScore)/sizeof(testScore[0]), testScore);
 
 
 #endif

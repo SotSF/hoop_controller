@@ -104,11 +104,11 @@ void loop()
         Chord composite = currentSong.next();
         Serial.print("Inbound composite: ");
         Serial.println(composite, BIN);
-        chordmap(composite, beginnote);
+        chordmap(composite, (void (*)(int))beginnote);
     }
     //Take action on the notes which are leading in and fading out
-    chordmap(upcoming, leadnote);
-    chordmap(fadingout, fadenote);
+    chordmap(upcoming, (void (*)(int))leadnote);
+    chordmap(fadingout, (void (*)(int)) fadenote);
     FastLED.show();
     FastLED.delay(1000/FPS);
 }
