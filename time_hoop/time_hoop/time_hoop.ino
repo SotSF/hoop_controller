@@ -2,7 +2,7 @@
 #include <TimeLib.h>
 #include <math.h>
 //#include "Fire.h"
-#include "Night.h"
+//#include "Night.h"
 
 FASTLED_USING_NAMESPACE
 
@@ -63,12 +63,12 @@ void setup() {
   loopCnt = 0;
 }
 
-typedef void (*displayFunc[])(CRGB*, int);
+typedef void (*displayFunc[])(int);
 
 
 displayFunc funArray = {
-  /*&runNight,*/
-  //&runFire
+  &runWheel,
+  &runFire
 };
 
 // Main function which is looped continuously
@@ -77,20 +77,21 @@ void loop()
 
   // display time on LEDs
   //LEDdisplay();
-  //int numPatterns = 1;
-  int numSecondsEachPattern = 60;
+  int numPatterns = 2;
+  int numSecondsEachPattern = 30;
 
   int nowInNumTicks = ((hour() * 60 * 60 ) + (minute() * 60) + second());
 
   int tick = nowInNumTicks % numSecondsEachPattern;
+  int funcIndex = (nowInNumTicks / numSecondsEachPattern) % numPatterns;
 
   // 20 sec * 60 min * 24 h
   // time = hour * 60 * 24
   // total / num_patterns
-  runFire(tick);
+  //runFire(tick);
   //runWheel(tick);
   //runNight(leds, NUM_LEDS, tick);
-  /*funArray[funcIndex](leds, tick);*/
+  funArray[funcIndex](tick);
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = patternBuff[i];
   }
@@ -184,7 +185,7 @@ void runFire(int tick) {
 
   if (tick == 0) {
     for (int i = 0; i < NUM_LEDS; i++) {
-      heat[i] = CRGB(70, 30, 20);
+      heat[i] = CRGB(150, 100, 80);
     }
   }
   // cool down whole LED strand
