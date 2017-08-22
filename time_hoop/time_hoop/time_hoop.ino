@@ -1,8 +1,10 @@
 #include <FastLED.h>
 #include <TimeLib.h>
 #include <math.h>
-//#include "Fire.h"
-//#include "Night.h"
+
+#include "Fire.h"
+#include "Night.h"
+#include "Wheel.h"
 
 FASTLED_USING_NAMESPACE
 
@@ -30,26 +32,22 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 CRGB patternBuff[NUM_LEDS];
-int heat[NUM_LEDS];
+//int heat[NUM_LEDS];
 
-CRGBPalette16 gPal;
+
 bool isInitialized;
 int loopCnt; // good for 12 days = 1mil seconds? TODO
-#define NUM_CHUNKS 12
-const int CHUNK_SIZE = floor((float)NUM_LEDS / NUM_CHUNKS);
 
-// wheel consts
 
-CRGB MIN_COLOR = CRGB(0, 0, 0);
-CRGB MAX_COLOR = CRGB(0, 250, 0);
+
 
 
 void setup() {
   // set the Time library to use Teensy 3.0's RTC to keep time
   setSyncProvider(getTeensy3Time);
 
-  Serial.begin(115200);
-  while (!Serial);  // Wait for Arduino Serial Monitor to open
+  //Serial.begin(115200);
+  //while (!Serial);  // Wait for Arduino Serial Monitor to open
   delay(3000); // 3 second delay for recovery
 
   // tell FastLED about the LED strip configuration
@@ -58,9 +56,7 @@ void setup() {
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
-  // for fire pattern
-  gPal = HeatColors_p;
-
+  
   loopCnt = 0;
    isInitialized = false;
 
@@ -69,7 +65,14 @@ void setup() {
 typedef void (*displayFunc[])(int);
 
 displayFunc funArray = {
-  &runBrightOrange,
+  &runBrightOrange//,
+  //&runFire
+};
+
+typedef void (*displayFuncClass[])(CRGB*, int);
+
+displayFuncClass funArray2 = {
+  &runNight,
   &runWheel,
   &runFire
 };
@@ -77,7 +80,6 @@ displayFunc funArray = {
 // Main function which is looped continuously
 void loop()
 {
-
   // display time on LEDs
   //LEDdisplay();
   int numPatterns = 3;
@@ -103,7 +105,8 @@ void loop()
   //runFire(tick);
   //runWheel(tick);
   //runNight(leds, NUM_LEDS, tick);
-  funArray[funcIndex](tick);
+  //funArray[funcIndex](tick);
+  funArray2[funcIndex](patternBuff, tick);
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = patternBuff[i];
   }
@@ -164,15 +167,6 @@ time_t getTeensy3Time()
   return Teensy3Clock.get();
 }
 
-void LEDdisplay() {
-  if (second() == 0) {
-    FastLED.clear();
-  } else {
-    leds[ second() ] += CRGB::Red;
-  }
-  leds[minute() + 60] += CRGB::Blue;
-}
-
 CRGB average(CRGB* lst, int len) {
   int r = 0;
   int g = 0;
@@ -185,100 +179,6 @@ CRGB average(CRGB* lst, int len) {
   return CRGB(floor((float)r / len), floor((float)g / len), floor((float)b / len));
 }
 
-// keeps the pixel safe from going off the edge - TODO there's probably a built-in for ..
-int SF(int centroid, int i) {
-  return (centroid + i) % NUM_LEDS;
-}
-
-void runFire(int tick) {
-
-  int COOLING = 130; // decrease to make white-hot
-  int SPARKING = 170;
-
-  if (tick == 0) {
-    for (int i = 0; i < NUM_LEDS; i++) {
-       heat[i] = 40;
-    }
-  }
-  // cool down whole LED strand
-  // for each chunk, get centroid
-  //   leds drift forwards & backwards
-  //   ignite sparks forwards & backwards
-  // map whole
-
-  // Step 1.  Cool down every cell a little
-  for ( int i = 0; i < NUM_LEDS; i++) {
-    heat[i] = qsub8(heat[i], random8(0, floor(((float)COOLING * 10) / CHUNK_SIZE) + 1));
-  }
-
-  for (int j = 0; j < NUM_CHUNKS; j++) {
-    int half_chunk = floor((float)CHUNK_SIZE / 2);
-    int cent = floor(j * 2 * half_chunk) + half_chunk; // shouldn't need floor
-
-    // Step 2.  leds from each cell drifts 'up' and diffuses a little
-    for ( int k = half_chunk + floor(half_chunk / 2) - 4; k > 0; k--) {
-
-      int prev[4];
-      prev[0] = heat[SF(cent, k - 1)];
-      prev[1] = heat[SF(cent, k - 2)];
-      prev[2] = heat[SF(cent, k - 3)];
-      prev[3] = heat[SF(cent, k - 4)];
-
-      int nxt[4];
-      nxt[0] =  heat[SF(cent, -1 * (k - 1))];
-      nxt[1] =  heat[SF(cent, -1 * (k - 2))];
-      nxt[2] =  heat[SF(cent, -1 * (k - 3))];
-      nxt[3] =  heat[SF(cent, -1 * (k - 4))];
-
-      heat[SF(cent, k)] = floor((float)(prev[0] + prev[1] + prev[2] + prev[3]) / 4);
-      heat[SF(cent, -1 * k)] = floor((float)(nxt[0] + nxt[1] + nxt[2] + prev[3]) / 4);
-    }
-
-    // Step 3.  Randomly ignite new 'sparks' of leds near the bottom
-    if ( random8(j) < SPARKING ) {
-      int y = random8(7 + j);
-      heat[SF(cent, y)] = qadd8(heat[SF(cent, y)], random8(100, 140));
-      int z = random8(8 + j);
-      heat[SF(cent, z)] = qadd8(heat[SF(cent, z)], random8(100, 140));
-    }
-  }
-
-  // Step 4.  Map from leds cells to LED colors
-  for ( int j = 0; j < NUM_LEDS; j++) {
-
-    // Scale the leds value from 0-255 down to 0-240
-    // for best results with color palettes.
-    byte colorindex = scale8( heat[j], 240);
-    CRGB color = ColorFromPalette( gPal, colorindex);
-    patternBuff[j] = color;
-  }
-}
-
-void runWheel(int tick) {
-  if (tick == 0) {
-    for (int i = 0; i < NUM_CHUNKS; i++) {
-      for (int j = 0; j < CHUNK_SIZE; j++) {
-
-        int newPos = i * CHUNK_SIZE + j;
-        CRGB col = scaleColor(j);
-        patternBuff[newPos] = col;
-      }
-    }
-  }
-
-  for ( int i = NUM_LEDS - 1; i >= 0;  i--) {
-    int pos = ((i - 1) + NUM_LEDS) % NUM_LEDS;
-    patternBuff[i] = patternBuff[pos];
-  }
-}
-
-
-CRGB scaleColor(int i) {
-  int r = ((MAX_COLOR[0] - MIN_COLOR[0]) * ((float)i / CHUNK_SIZE)) + MIN_COLOR[0];
-  int g = ((MAX_COLOR[1] - MIN_COLOR[1]) * ((float)i / CHUNK_SIZE)) + MIN_COLOR[1];
-  int b = ((MAX_COLOR[2] - MIN_COLOR[2]) * ((float)i / CHUNK_SIZE)) + MIN_COLOR[2];
-  return CRGB(round(r), round(g), round(b));
-}
 
 void runBrightOrange(int tick) {
   for ( int i = 0; i < NUM_LEDS; i++) {

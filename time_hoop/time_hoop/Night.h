@@ -4,6 +4,8 @@
 #ifndef Night_h
 #define Night_h
 
-void runNight(CRGB*, int, int);
+#include "Globals.h"
+
+void runNight(CRGB*, int);
 
 #endif

@@ -4,6 +4,7 @@
 #ifndef Fire_h
 #define Fire_h
 
-void runFire(CRGB*, int, int);
+void runFire(CRGB*, int);
 
+int SF(int, int);
 #endif
