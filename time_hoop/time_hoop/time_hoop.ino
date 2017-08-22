@@ -95,7 +95,7 @@ void loop()
 }
 
 void OverlaySun() {
-  int pos = floor(hour() * ((float)NUM_LEDS / 24));
+  int pos = floor(((hour() + 12) % 24) * ((float)NUM_LEDS / 24));
   // Set the center of the sun
   leds[pos] = CRGB(SUN_R, SUN_G, SUN_B) + patternBuff[pos];
 
@@ -196,7 +196,6 @@ void runFire(int tick) {
       heat[SF(cent, y)] = qadd8(heat[SF(cent, y)], random8(100, 140));
       int z = random8(8 + j);
       heat[SF(cent, z)] = qadd8(heat[SF(cent, z)], random8(100, 140));
-      Serial.println();
     }
   }
 
