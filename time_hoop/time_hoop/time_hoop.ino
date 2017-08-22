@@ -33,6 +33,7 @@ CRGB patternBuff[NUM_LEDS];
 int heat[NUM_LEDS];
 
 CRGBPalette16 gPal;
+bool isInitialized;
 int loopCnt; // good for 12 days = 1mil seconds? TODO
 #define NUM_CHUNKS 12
 const int CHUNK_SIZE = floor((float)NUM_LEDS / NUM_CHUNKS);
@@ -61,12 +62,14 @@ void setup() {
   gPal = HeatColors_p;
 
   loopCnt = 0;
+   isInitialized = false;
+
 }
 
 typedef void (*displayFunc[])(int);
 
-
 displayFunc funArray = {
+  &runBrightOrange,
   &runWheel,
   &runFire
 };
@@ -77,13 +80,22 @@ void loop()
 
   // display time on LEDs
   //LEDdisplay();
-  int numPatterns = 2;
-  int numSecondsEachPattern = 30;
+  int numPatterns = 3;
+  int numSecondsEachPattern = 10;
 
   int nowInNumTicks = ((hour() * 60 * 60 ) + (minute() * 60) + second());
 
   int tick = nowInNumTicks % numSecondsEachPattern;
+  if (tick == 0) {
+    isInitialized = true;
+  }
   int funcIndex = (nowInNumTicks / numSecondsEachPattern) % numPatterns;
+
+  // if we haven't initialized, start off with full orange
+  // if loopCnt < numSecondsEachPattern and tick has never been 0
+  if (!isInitialized) {
+    funcIndex = 0;
+  }
 
   // 20 sec * 60 min * 24 h
   // time = hour * 60 * 24
@@ -185,7 +197,7 @@ void runFire(int tick) {
 
   if (tick == 0) {
     for (int i = 0; i < NUM_LEDS; i++) {
-      heat[i] = CRGB(150, 100, 80);
+       heat[i] = 40;
     }
   }
   // cool down whole LED strand
@@ -266,5 +278,11 @@ CRGB scaleColor(int i) {
   int g = ((MAX_COLOR[1] - MIN_COLOR[1]) * ((float)i / CHUNK_SIZE)) + MIN_COLOR[1];
   int b = ((MAX_COLOR[2] - MIN_COLOR[2]) * ((float)i / CHUNK_SIZE)) + MIN_COLOR[2];
   return CRGB(round(r), round(g), round(b));
+}
+
+void runBrightOrange(int tick) {
+  for ( int i = 0; i < NUM_LEDS; i++) {
+    patternBuff[i] = CRGB(250, 0, 10);
+  }
 }
 
