@@ -17,14 +17,15 @@ FASTLED_USING_NAMESPACE
 #define FRAMES_PER_SECOND  60
 
 // Sun consts
-#define SUN_SPREAD 10
+#define SUN_SPREAD 16
 #define SUN_HUE 70
 #define SUN_SAT 255
 #define SUN_V 255
 // alternate because schimmy hates HSV
 #define SUN_R 246
-#define SUN_G 202
-#define SUN_B 25
+#define SUN_G 230
+#define SUN_B 50
+#define SUN_SPEED 6 // higher = slower strobe
 
 
 CRGB leds[NUM_LEDS];
@@ -32,6 +33,7 @@ CRGB patternBuff[NUM_LEDS];
 int heat[NUM_LEDS];
 
 CRGBPalette16 gPal;
+int loopCnt; // good for 12 days = 1mil seconds? TODO
 #define NUM_CHUNKS 12
 const int CHUNK_SIZE = floor((float)NUM_LEDS / NUM_CHUNKS);
 
@@ -57,9 +59,12 @@ void setup() {
 
   // for fire pattern
   gPal = HeatColors_p;
+
+  loopCnt = 0;
 }
 
 typedef void (*displayFunc[])(CRGB*, int);
+
 
 displayFunc funArray = {
   /*&runNight,*/
@@ -89,29 +94,55 @@ void loop()
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = patternBuff[i];
   }
-  OverlaySun();
+  OverlaySun((int)floor((float)loopCnt / SUN_SPEED));
   FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
+  loopCnt++;
 }
 
-void OverlaySun() {
+void OverlaySun(int tick) {
+  if ((tick %3) == 0 ) {
+    tick = 0;
+  }else if ((tick %3) == 1) {
+    tick = 2;
+  } else {
+    tick = 1;
+    }
+  CRGB levelSun = CRGB(SUN_R, SUN_G, SUN_B);
+  //CRGB levelSun = CRGB(255, 255, 55);
+  CRGB midSun = CRGB(80, 80, 10);
+  CRGB darkSun = CRGB(5, 5, 5);
+
   int pos = floor(((hour() + 12) % 24) * ((float)NUM_LEDS / 24));
   // Set the center of the sun
-  leds[pos] = CRGB(SUN_R, SUN_G, SUN_B) + patternBuff[pos];
+  for ( int i = 0 ; i < SUN_SPREAD; i++) {
+    int forwardPos = (pos + i) % NUM_LEDS;
+    int rearPos = (pos + NUM_LEDS - i ) % NUM_LEDS;
+    leds[forwardPos] = levelSun;
+    leds[forwardPos].fadeToBlackBy((int)floor(((float)i /SUN_SPREAD) * 255));
+    leds[rearPos] = levelSun;
+    leds[rearPos].fadeToBlackBy((int)floor(((float)i /SUN_SPREAD) * 255));
+  }
 
   // spread the sun center
-  if (SUN_SPREAD > 0) {
-    for (int i = 1; i <= SUN_SPREAD; i++) {
-      int forwardPos = (pos + i) % NUM_LEDS;
-      int rearPos = (pos + NUM_LEDS - i) % NUM_LEDS;
+  for (int i = tick + 1; i <= SUN_SPREAD-4; i+=3) {
+      for (int j = 0; j < 3; j++) {
+        CRGB color = levelSun;
+        if (j == 1) {
+          color = midSun;
+        }
+        if (j == 2) {
+          color = darkSun;
+        }
 
-      //CRGB levelSun = CRGB(SUN_R, SUN_G, SUN_B);
-      //levelSun.subtractFromRGB(floor(255 * ((float)i / SUN_SPREAD)));
+        int forwardPos = (pos + i + j) % NUM_LEDS;
+        int rearPos = (pos + NUM_LEDS - i - j) % NUM_LEDS;
 
-      CRGB levelSun = CRGB(0, 0, 200);
-      leds[forwardPos] = levelSun;// + avgBack;
-      leds[rearPos] = levelSun;// + avgBack;
-    }
+        leds[forwardPos] = color;
+        leds[forwardPos].fadeToBlackBy((int)floor(((float)i /SUN_SPREAD) * 255));
+        leds[rearPos] = color;
+        leds[rearPos].fadeToBlackBy((int)floor(((float)i /SUN_SPREAD) * 255));
+      }
   }
 }
 
