@@ -13,7 +13,7 @@ CRGB scaleColor(int i) {
   return CRGB(round(r), round(g), round(b));
 }
 
-void runWheel(CRGB* pBuf, int tick) {
+void runWheel(CRGB* pBuf, int tick, int loopCnt) {
   if (tick == 0) {
     for (int i = 0; i < NUM_CHUNKS; i++) {
       for (int j = 0; j < CHUNK_SIZE; j++) {

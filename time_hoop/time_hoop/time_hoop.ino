@@ -5,6 +5,7 @@
 #include "Fire.h"
 #include "Night.h"
 #include "Wheel.h"
+#include "Breath.h"
 
 FASTLED_USING_NAMESPACE
 
@@ -13,21 +14,7 @@ FASTLED_USING_NAMESPACE
 
 #define LED_TYPE    NEOPIXEL
 #define COLOR_ORDER BGR
-#define NUM_LEDS    380
 
-#define BRIGHTNESS          96
-#define FRAMES_PER_SECOND  60
-
-// Sun consts
-#define SUN_SPREAD 16
-#define SUN_HUE 70
-#define SUN_SAT 255
-#define SUN_V 255
-// alternate because schimmy hates HSV
-#define SUN_R 246
-#define SUN_G 230
-#define SUN_B 50
-#define SUN_SPEED 6 // higher = slower strobe
 
 
 CRGB leds[NUM_LEDS];
@@ -38,16 +25,12 @@ CRGB patternBuff[NUM_LEDS];
 bool isInitialized;
 int loopCnt; // good for 12 days = 1mil seconds? TODO
 
-
-
-
-
 void setup() {
   // set the Time library to use Teensy 3.0's RTC to keep time
   setSyncProvider(getTeensy3Time);
 
-  //Serial.begin(115200);
-  //while (!Serial);  // Wait for Arduino Serial Monitor to open
+  Serial.begin(115200);
+  while (!Serial);  // Wait for Arduino Serial Monitor to open
   delay(3000); // 3 second delay for recovery
 
   // tell FastLED about the LED strip configuration
@@ -56,27 +39,26 @@ void setup() {
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
-  
   loopCnt = 0;
-   isInitialized = false;
-
+  isInitialized = false;
 }
 
-typedef void (*displayFunc[])(int);
+//typedef void (*displayFunc[])(int);
+typedef void (*displayFunc[])(CRGB*, int, int);
 
-displayFunc funArray = {
-  &runBrightOrange//,
-  //&runFire
-};
+void runBlueNight(CRGB* pBuf, int tick, int loopC) {
+  fill_solid(pBuf, NUM_LEDS, CRGB::Blue);
+}
 
-typedef void (*displayFuncClass[])(CRGB*, int);
-
-displayFuncClass funArray2 = {
-  &runFire,
+displayFunc funArray2 = {
+  &runFire,/*
   &runNight,
   &runFire,
   &runWheel,
-  &runFire
+  &runFire,*/
+  &runBlueNight,
+  &runWheel
+  //&runBlueBreath
 };
 
 // Main function which is looped continuously
@@ -104,11 +86,10 @@ void loop()
   // 20 sec * 60 min * 24 h
   // time = hour * 60 * 24
   // total / num_patterns
-  //runFire(tick);
-  //runWheel(tick);
-  //runNight(leds, NUM_LEDS, tick);
-  //funArray[funcIndex](tick);
-  funArray2[funcIndex](patternBuff, tick);
+  //ideas:
+  //  - pass in color, that gives us a couple of things
+  //  -
+  funArray2[funcIndex](patternBuff, tick, loopCnt);
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = patternBuff[i];
   }

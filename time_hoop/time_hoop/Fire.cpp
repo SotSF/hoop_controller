@@ -17,7 +17,7 @@ int SF(int centroid, int i) {
   return (centroid + i) % NUM_LEDS;
 }
 
-void runFire(CRGB* pBuff, int tick) {
+void runFire(CRGB* pBuff, int tick, int loopCnt) {
 // for fire pattern
   gPal = HeatColors_p;
 

@@ -6,7 +6,7 @@
 
 #include "Globals.h"
 
-void runWheel(CRGB*, int);
+void runWheel(CRGB*, int, int);
 
 CRGB scaleColor(int);
 

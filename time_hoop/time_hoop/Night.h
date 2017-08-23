@@ -6,6 +6,6 @@
 
 #include "Globals.h"
 
-void runNight(CRGB*, int);
+void runNight(CRGB*, int, int);
 
 #endif
