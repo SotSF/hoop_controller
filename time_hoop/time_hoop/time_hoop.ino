@@ -72,7 +72,9 @@ displayFunc funArray = {
 typedef void (*displayFuncClass[])(CRGB*, int);
 
 displayFuncClass funArray2 = {
+  &runFire,
   &runNight,
+  &runFire,
   &runWheel,
   &runFire
 };
