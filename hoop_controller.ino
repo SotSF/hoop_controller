@@ -1,33 +1,37 @@
 #include "Chords.h"
 #include "Notes.h"
 #include "Song.h"
-#include "SongTest.h"
+#include "SongHereComesTheSun.h"
+#include "SongZeldaSun.h"
+#include "SongBlisterInTheSun.h"
+#include "SongWhenTheSaints.h"
 #include "FastLED.h"
+#include "TimeLib.h"
 
 FASTLED_USING_NAMESPACE
 
 #define DATA_PIN    11
 #define CLK_PIN     13
 #define LED_TYPE    APA102
+#define COLOR_ORDER BGR
 #define NUM_LEDS    216
 #define BLOCKSIZE   NUM_LEDS/12
 #define OFFSET(note) (BLOCKSIZE * (note - 1))
-#define BRIGHTNESS  5
+#define BRIGHTNESS  50
 #define FPS         30
 
 CRGB leds[NUM_LEDS];
-SongClass currentSong = SongTest;
+SongClass currentSong = SongHereComesTheSun;
 float lastSongSet = 0;
-
-const char* NoteNames[] = { "rest","C ","Cs","D ","Ds","E ","F ","Fs","G ","Gs","A ","As","B " };
+CRGB background_light_color = CRGB(0, 0, 0);
+CRGB note_color = CRGB(255, 0, 0);
+time_t previous_minute = minute(now());
 void setup() {
     delay(3000); // 3 second delay for recovery
-
-    FastLED.addLeds<LED_TYPE, DATA_PIN, CLK_PIN>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<LED_TYPE, DATA_PIN, CLK_PIN, COLOR_ORDER,DATA_RATE_MHZ(10)>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.setBrightness(BRIGHTNESS);
-
     for (int i = 0; i < NUM_LEDS; i++) {
-        leds[i] = CRGB(5, 5, 25);
+        leds[i] = background_light_color;
     }
 }
 
@@ -36,16 +40,17 @@ Chord fadingout = 0;
 
 // Begins a note's lead-in with two red dots at opposite ends
 void beginnote(Note note) {
-    Serial.println(NoteNames[note]);
+  Serial.println(note);
     upcoming |= Notes[note];
-    leds[OFFSET(note)] = CRGB(100,6,0);
-    leds[OFFSET(note)+BLOCKSIZE-1] = CRGB(100,6,0);
+  Serial.println(upcoming);
+    leds[OFFSET(note)] = CRGB(250,6,0);
+    leds[OFFSET(note)+BLOCKSIZE-1] = CRGB(250,6,0);
 }
 
 // Repaints the background for a given note-block
 void fillbg(Note note) {
     for (byte i = 0; i < BLOCKSIZE; i++) {
-        leds[OFFSET(note) + i] = CRGB(5, 5, 25);
+        leds[OFFSET(note) + i] = background_light_color;
     }
 }
 
@@ -71,7 +76,7 @@ void leadnote(Note note) {
     // and add to fading out
     if (finished) {
         for (byte i = 0; i < BLOCKSIZE; i++) {
-            leds[start + i] = CRGB(155, 155, 155);
+            leds[start + i] = note_color;
         }
         upcoming ^= Notes[note];
         fadingout |= Notes[note];
@@ -90,24 +95,44 @@ void fadenote(Note note) {
     }
 }
 
-// Main function which is looped continuously
-void loop()
-{
-    if (millis() - lastSongSet >= 60000) {
-        if (currentSong.getPosition() == currentSong.getLength()){
-          // TODO: set Next Song
-          lastSongSet = millis();
-        }
+void determineSongToPlay(){
+  time_t current_minute = minute(now());  
+  if ( current_minute > previous_minute+3 ) {
+    switch(random(0,4)) {
+      case 0:
+        currentSong = SongWhenTheSaints;
+        note_color = CRGB(255, 100, 180);
+        break;
+      case 1:
+        currentSong = SongHereComesTheSun;
+        note_color = CRGB(255, 0, 0);
+        break;
+      case 2:
+        currentSong = SongZeldaSun;
+        note_color = CRGB(40, 255, 0);
+        break;      
+      case 3:
+        currentSong = SongBlisterInTheSun;
+        note_color = CRGB(255, 255, 0);
     }
+    previous_minute = current_minute;
+  }
+}
+
+// Main function which is looped continuously
+void loop() {
+  determineSongToPlay();        
+
+    chordmap(upcoming, (void (*)(int)) leadnote);
     // Fetch a new note every beat, apply the beginnote function
     EVERY_N_MILLISECONDS(60000L / currentSong.BPM) {
         Chord composite = currentSong.next();
         Serial.print("Inbound composite: ");
         Serial.println(composite, BIN);
-        chordmap(composite, (void (*)(int))beginnote);
+        chordmap(composite, (void (*)(int)) beginnote);
     }
     //Take action on the notes which are leading in and fading out
-    chordmap(upcoming, (void (*)(int))leadnote);
+
     chordmap(fadingout, (void (*)(int)) fadenote);
     FastLED.show();
     FastLED.delay(1000/FPS);
