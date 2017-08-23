@@ -6,4 +6,5 @@
 
 void runFire(CRGB*, int, int);
 
+int SF(int, int);
 #endif
