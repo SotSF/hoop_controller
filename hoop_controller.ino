@@ -20,6 +20,9 @@ FASTLED_USING_NAMESPACE
 #define BRIGHTNESS  50
 #define FPS         30
 
+
+#define DIRTY_TWEEK_OFFSET    -4
+
 CRGB leds[NUM_LEDS];
 SongClass currentSong = SongHereComesTheSun;
 float lastSongSet = 0;
@@ -35,6 +38,8 @@ void setup() {
     }
 }
 
+
+
 Chord upcoming = 0;
 Chord fadingout = 0;
 
@@ -43,14 +48,14 @@ void beginnote(Note note) {
   Serial.println(note);
     upcoming |= Notes[note];
   Serial.println(upcoming);
-    leds[OFFSET(note)] = CRGB(250,6,0);
-    leds[OFFSET(note)+BLOCKSIZE-1] = CRGB(250,6,0);
+    leds[OFFSET(note)+ DIRTY_TWEEK_OFFSET] = CRGB(250,6,0);
+    leds[OFFSET(note)+BLOCKSIZE-1+ DIRTY_TWEEK_OFFSET] = CRGB(250,6,0);
 }
 
 // Repaints the background for a given note-block
 void fillbg(Note note) {
     for (byte i = 0; i < BLOCKSIZE; i++) {
-        leds[OFFSET(note) + i] = background_light_color;
+        leds[OFFSET(note) + i + DIRTY_TWEEK_OFFSET] = background_light_color;
     }
 }
 
@@ -76,7 +81,7 @@ void leadnote(Note note) {
     // and add to fading out
     if (finished) {
         for (byte i = 0; i < BLOCKSIZE; i++) {
-            leds[start + i] = note_color;
+            leds[start + i+DIRTY_TWEEK_OFFSET] = note_color;
         }
         upcoming ^= Notes[note];
         fadingout |= Notes[note];
